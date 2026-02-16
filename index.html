@@ -1,42 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NBA Playoff Oracle</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Playoff Oracle - Team Probability Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for icons (optional but nice) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="navbar">
-        <h1>NBA Playoff Oracle</h1>
-    </div>
-    
-    <div class="container">
-        <!-- Summary Stats Section -->
-        <div id="summary-stats" class="summary-grid"></div>
-        
-        <!-- Search and Filter Section -->
-        <div class="search-container">
-            <input type="text" id="team-search" placeholder="Search teams...">
+    <!-- NBA-style Header -->
+    <header class="nba-header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-basketball-ball"></i>
+                <h1>NBA <span>PLAYOFF ORACLE</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="active">Teams</a></li>
+                    <li><a href="#">Standings</a></li>
+                    <li><a href="#">Playoff Picture</a></li>
+                    <li><a href="#">Predictions</a></li>
+                </ul>
+            </nav>
+            <div class="last-updated">
+                <i class="far fa-clock"></i>
+                <span id="last-updated">Loading...</span>
+            </div>
         </div>
-        
-        <div class="filter-buttons">
-            <button class="filter-button" data-filter="all">All Teams</button>
-            <button class="filter-button" data-filter="locks">Locks (90%+)</button>
-            <button class="filter-button" data-filter="bubble">Bubble (40-60%)</button>
-            <button class="filter-button" data-filter="longshots">Long Shots</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Conference Tabs -->
+        <div class="conference-tabs">
+            <button class="tab-button active" data-conference="all">All Teams</button>
+            <button class="tab-button" data-conference="east">Eastern Conference</button>
+            <button class="tab-button" data-conference="west">Western Conference</button>
         </div>
-        
-        <!-- Teams Container -->
-        <h2>2024 Playoff Probabilities</h2>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="team-search" placeholder="Search teams...">
+            </div>
+            <div class="filter-dropdown">
+                <select id="probability-filter">
+                    <option value="all">All Probabilities</option>
+                    <option value="high">Locks (90%+)</option>
+                    <option value="medium">Likely (60-89%)</option>
+                    <option value="bubble">Bubble (40-59%)</option>
+                    <option value="low">Long Shots (10-39%)</option>
+                    <option value="eliminated">Eliminated (<10%)</option>
+                </select>
+            </div>
+            <button id="refresh-button" class="refresh-btn">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+
+        <!-- Summary Stats Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-icon lock">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Locks (90%+)</span>
+                    <span class="summary-value" id="lock-count">0</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon bubble">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Bubble Teams</span>
+                    <span class="summary-value" id="bubble-count">0</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon longshot">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Long Shots</span>
+                    <span class="summary-value" id="longshot-count">0</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon eliminated">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Eliminated</span>
+                    <span class="summary-value" id="eliminated-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teams Grid Container -->
         <div id="teams-container" class="teams-grid">
             <!-- JavaScript will populate this -->
         </div>
-        
-        <!-- Footer -->
-        <div class="footer">
-            <p>Last updated: <span id="last-updated">Loading...</span></p>
-            <button id="refresh-button" class="refresh-button">🔄 Refresh</button>
-        </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="nba-footer">
+        <p>Data updates every 5 minutes | NBA Playoff Oracle &copy; 2024</p>
+        <p class="footnote">Probabilities based on advanced analytics and historical data</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
