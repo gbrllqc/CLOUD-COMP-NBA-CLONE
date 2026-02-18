@@ -1,0 +1,317 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+}
+
+.nba-black-header {
+    background-color: #000;
+    color: #fff;
+    width: 100%;
+}
+
+.black-header-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    padding: 0 24px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.left-menu {
+    display: flex;
+    gap: 24px;
+}
+
+.left-menu a {
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding-bottom: 3px;
+    border-bottom: 2px solid transparent;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.left-menu a.active-page {
+    border-bottom: 2px solid #ffd700; /* yellow highlight */
+    font-weight: 600;
+}
+
+.right-user {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.right-user a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.right-user .sign-in {
+    background: #2a2a2a;
+    padding: 4px 12px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 600;
+}
+
+.search-icon, .user-icon {
+    margin-right: 5px;
+}
+
+.oracle-subheader {
+    background-color: #000;
+    border-top: 1px solid #2a2a2a;  
+    padding: 8px 24px;
+}
+
+.oracle-subheader-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.oracle-title-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.nba-mini {
+    font-weight: 800;
+    font-size: 22px;
+    background: white;
+    color: black;
+    padding: 0 6px;
+    border-radius: 4px;
+    line-height: 1.2;
+}
+
+.oracle-word {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+    border-left: 2px solid #444;
+    padding-left: 15px;
+}
+
+.azure-badge {
+    background: #2a2a2a;
+    color: #ffd966;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 30px;
+    border: 1px solid #444;
+}
+
+.playoff-pill {
+    background: #ffd700;
+    color: #0a2f5a;
+    font-weight: 800;
+    padding: 6px 18px;
+    border-radius: 40px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.main-container {
+    max-width: 1280px;
+    margin: 30px auto 40px;
+    padding: 0 24px;
+}
+
+.headline-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #bbb;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.headline-row h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0c2b55;
+}
+
+.pill-azure {
+    background: #e6edf8;
+    padding: 6px 15px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #174c8f;
+}
+
+.filter-hint {
+    background: #f0f4fa;
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+/* tabs for east/west/all */
+.conf-tabs {
+    display: flex;
+    gap: 30px;
+    border-bottom: 1px solid #aaa;
+    margin: 20px 0 20px;
+}
+
+.conf-tab {
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 8px 0 12px;
+    cursor: pointer;
+    color: #333;
+    border-bottom: 4px solid transparent;
+}
+
+.conf-tab.active-conf {
+    border-bottom: 4px solid #174c8f;
+    color: #174c8f;
+}
+
+/* table structure (empty of data — just layout) */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+    margin: 20px 0 30px;
+}
+
+.stats-table th {
+    background: #eef2f7;
+    text-align: left;
+    padding: 18px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #111;
+}
+
+.stats-table td {
+    padding: 18px 12px;
+    border-bottom: 1px solid #eaeef2;
+    background: white;
+}
+
+/* placeholder cells — no real team data */
+.team-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fake-logo {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(145deg, #aaa, #ccc);
+    border-radius: 50%;
+}
+
+.fake-streak {
+    background: #e0e7ef;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    color: transparent;
+    text-shadow: none;
+    position: relative;
+    display: inline-block;
+}
+
+.fake-streak::after {
+    content: "W3";
+    color: transparent;
+}
+
+.playoff-fake {
+    font-weight: 800;
+    color: #174c8f;
+    background: #dbeafe;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 15px;
+    display: inline-block;
+}
+
+.news-footer {
+    background: white;
+    border-radius: 18px;
+    padding: 20px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 6px solid #ffd700;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    margin-top: 40px;
+}
+
+.news-headline {
+    font-weight: 700;
+    color: #1e1e1e;
+}
+
+.see-all-link {
+    color: #174c8f;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.security-note {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #3a4a5a;
+    text-align: center;
+    border-top: 1px dashed #bbb;
+    padding-top: 20px;
+}
+
+.empty-notice {
+    background: #f9fafc;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    border: 1px dashed #a0b8d4;
+    color: #2e4b7a;
+    font-weight: 500;
+    margin: 30px 0 10px;
+}
+
+.empty-notice i {
+    font-style: normal;
+    background: #ffd966;
+    padding: 2px 10px;
+    border-radius: 30px;
+}

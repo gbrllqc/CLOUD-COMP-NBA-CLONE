@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA · playoff oracle (layout)</title>
+    <link rel="stylesheet" href="nba_style.css">
+</head>
+<body>
+
+<header class="nba-black-header">
+    <div class="black-header-inner">
+        <div class="left-menu">
+            <a href="#">NBA</a>
+            <a href="#">ALL-STAR</a>
+            <a href="#">SCHEDULE</a>
+            <a href="#">WATCH</a>
+            <a href="#">NEWS</a>
+            <a href="#">STATS</a>
+            <a href="#">STANDINGS</a>
+            <a href="#" class="active-page">PLAYOFFPROBABILITY</a>  
+            <a href="#">TEAMS</a>
+            <a href="#">PLAYERS</a>
+            <a href="#">FANTASY</a>
+        </div>
+        <div class="right-user">
+            <a href="#"><span class="search-icon">🔍</span>SEARCH</a>
+            <a href="#"><span class="user-icon">👤</span>ACCOUNT</a>
+            <a href="#" class="sign-in">SIGN IN</a>
+        </div>
+    </div>
+
+    <div class="oracle-subheader">
+        <div class="oracle-subheader-inner">
+            <div class="oracle-title-area">
+                <span class="nba-mini">NBA</span>
+                <span class="oracle-word">POSTSEASON ORACLE</span>
+                <span class="azure-badge">Powered by Azure ML & AI</span>
+            </div>
+            <div class="playoff-pill">
+                🏆 2026 PLAYOFF ODDS
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="main-container">
+
+    <div class="headline-row">
+        <h1>2026 NBA Playoff Probabilities</h1>
+        <div class="pill-azure">
+            <span>📁 predictions.json · Azure blob</span>
+        </div>
+    </div>
+
+    <div class="filter-hint">
+        ⚡ ALL TEAMS &nbsp;&nbsp; EASTERN CONFERENCE &nbsp;&nbsp; WESTERN CONFERENCE
+    </div>
+
+    <div class="conf-tabs">
+        <button class="conf-tab active-conf" id="tabAll">ALL TEAMS</button>
+        <button class="conf-tab" id="tabEast">EASTERN CONFERENCE</button>
+        <button class="conf-tab" id="tabWest">WESTERN CONFERENCE</button>
+    </div>
+
+    <!--filled later by .json file -->
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>RANK</th>
+                <th>TEAM</th>
+                <th>RECORD</th>
+                <th>LAST 10</th>
+                <th>STREAK</th>
+                <th>PLAYOFF %</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr>
+                <td>1</td>
+                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
+                <td>00-00</td>
+                <td>0-0</td>
+                <td><span class="fake-streak">W0</span></td>
+                <td><span class="playoff-fake">--.-%</span></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
+                <td>00-00</td>
+                <td>0-0</td>
+                <td><span class="fake-streak">L0</span></td>
+                <td><span class="playoff-fake">--.-%</span></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
+                <td>00-00</td>
+                <td>0-0</td>
+                <td><span class="fake-streak">W0</span></td>
+                <td><span class="playoff-fake">--.-%</span></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
+                <td>00-00</td>
+                <td>0-0</td>
+                <td><span class="fake-streak">W0</span></td>
+                <td><span class="playoff-fake">--.-%</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="empty-notice">
+        ⚠️ This is a layout shell. <i>predictions.json</i> will populate real playoff percentages.<br>
+        (Your file tree: client/index.html + style.css + app.js + predictions.json)
+    </div>
+
+    <div class="news-footer">
+        <div class="news-headline">
+            POWER RANKINGS: The home stretch begins · Chris Paul · Pistons best record
+        </div>
+        <a href="#" class="see-all-link">SEE ALL GAMES →</a>
+    </div>
+
+    <div class="security-note">
+        Azure static blob · GitHub Actions CI/CD · no keys exposed · external predictions.json · GitHub secrets
+    </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
