@@ -1,46 +1,35 @@
-(function() {
-    // fetch('predictions.json')
-    //   .then(res => res.json())
-    //   .then(data => { populateTable(data); })
-    //   .catch(err => console.warn('prediction data not loaded yet — layout mode'));
-
-    console.log('app.js: layout scaffold ready. No data loaded — awaiting predictions.json');
-
-    const tabAll = document.getElementById('tabAll');
-    const tabEast = document.getElementById('tabEast');
-    const tabWest = document.getElementById('tabWest');
-
-    function removeActiveClass() {
-        [tabAll, tabEast, tabWest].forEach(t => {
-            if (t) t.classList.remove('active-conf');
+fetch('predictions.json')
+    .then(response => response.json())
+    .then(data => {
+        console.log('Loaded predictions from JSON:', data);
+        
+        const eastTeams = ['Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', /* add all east teams */];
+        
+        const transformedData = data.map((item, index) => {
+            const conference = eastTeams.includes(item.Team_orig) ? 'East' : 'West';
+            
+            return {
+                teamName: item.Team_orig,
+                wins: item.Wins_orig,
+                losses: item.Losses_orig,
+                defRating: item['Defensive Rating_orig'],
+                threePct: item['Three Point %_orig'],
+                playoffPct: Math.round(item['1_predicted_proba'] * 100 * 10) / 10, // Round to 1 decimal
+                conference: conference
+            };
         });
-    }
-
-    if (tabAll) {
-        tabAll.addEventListener('click', function(e) {
-            removeActiveClass();
-            tabAll.classList.add('active-conf');
-            console.log('tab ALL (ui only) — data not yet bound');
+        
+        // Sort by playoff percentage
+        transformedData.sort((a, b) => b.playoffPct - a.playoffPct);
+        
+        // Add rank
+        transformedData.forEach((team, idx) => {
+            team.rank = idx + 1;
         });
-    }
-    if (tabEast) {
-        tabEast.addEventListener('click', function(e) {
-            removeActiveClass();
-            tabEast.classList.add('active-conf');
-            console.log('tab EAST (ui only)');
-        });
-    }
-    if (tabWest) {
-        tabWest.addEventListener('click', function(e) {
-            removeActiveClass();
-            tabWest.classList.add('active-conf');
-            console.log('tab WEST (ui only)');
-        });
-    }
-
-    // prepare table body reference for future data population
-    const tableBody = document.getElementById('tableBody');
-    if (tableBody) {
-        console.log('Table body found, ready for predictions.json injection later.');
-    }
-})();
+        
+        allTeamsData = transformedData;
+        filterAll(); // Show all teams by default
+    })
+    .catch(error => {
+        console.error('Error loading predictions.json:', error);
+    });
