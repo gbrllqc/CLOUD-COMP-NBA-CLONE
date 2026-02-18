@@ -67,10 +67,6 @@ body {
     font-weight: 600;
 }
 
-.search-icon, .user-icon {
-    margin-right: 5px;
-}
-
 .oracle-subheader {
     background-color: #000;
     border-top: 1px solid #2a2a2a;  
@@ -199,37 +195,11 @@ body {
     gap: 10px;
 }
 
-.fake-logo {
+.logo {
     width: 28px;
     height: 28px;
     background: linear-gradient(145deg, #aaa, #ccc);
     border-radius: 50%;
-}
-
-.fake-streak {
-    background: #e0e7ef;
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 13px;
-    color: transparent;
-    text-shadow: none;
-    position: relative;
-    display: inline-block;
-}
-
-.fake-streak::after {
-    content: "W3";
-    color: transparent;
-}
-
-.playoff-fake {
-    font-weight: 800;
-    color: #174c8f;
-    background: #dbeafe;
-    padding: 5px 10px;
-    border-radius: 30px;
-    font-size: 15px;
-    display: inline-block;
 }
 
 .security-note {
@@ -241,20 +211,3 @@ body {
     padding-top: 20px;
 }
 
-.empty-notice {
-    background: #f9fafc;
-    border-radius: 16px;
-    padding: 25px;
-    text-align: center;
-    border: 1px dashed #a0b8d4;
-    color: #2e4b7a;
-    font-weight: 500;
-    margin: 30px 0 10px;
-}
-
-.empty-notice i {
-    font-style: normal;
-    background: #ffd966;
-    padding: 2px 10px;
-    border-radius: 30px;
-}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA · playoff oracle (layout)</title>
+    <title>NBA · playoff oracle</title>
     <link rel="stylesheet" href="nba_style.css">
 </head>
 <body>
@@ -24,8 +24,8 @@
             <a href="#">FANTASY</a>
         </div>
         <div class="right-user">
-            <a href="#"><span class="search-icon"></span>SEARCH</a>
-            <a href="#"><span class="user-icon"></span>ACCOUNT</a>
+            <a href="#">SEARCH</a>
+            <a href="#">ACCOUNT</a>
             <a href="#" class="sign-in">SIGN IN</a>
         </div>
     </div>
@@ -45,6 +45,7 @@
 
     <div class="headline-row">
         <h1>2026 NBA Playoff Probabilities</h1>
+        <div class="pill-azure">2026 NBA Playoff Probabilities</div>
     </div>
 
     <div class="conf-tabs">
@@ -53,61 +54,25 @@
         <button class="conf-tab" id="tabWest">WESTERN CONFERENCE</button>
     </div>
 
-    <!--filled later by .json file -->
+    <!-- Table structure optimized for your dataset -->
     <table class="stats-table">
         <thead>
             <tr>
                 <th>RANK</th>
                 <th>TEAM</th>
                 <th>RECORD</th>
-                <th>LAST 10</th>
-                <th>STREAK</th>
+                <th>DEF RATING</th>
+                <th>3P%</th>
                 <th>PLAYOFF %</th>
             </tr>
         </thead>
         <tbody id="tableBody">
-            <tr>
-                <td>1</td>
-                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
-                <td>00-00</td>
-                <td>0-0</td>
-                <td><span class="fake-streak">W0</span></td>
-                <td><span class="playoff-fake">--.-%</span></td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
-                <td>00-00</td>
-                <td>0-0</td>
-                <td><span class="fake-streak">L0</span></td>
-                <td><span class="playoff-fake">--.-%</span></td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
-                <td>00-00</td>
-                <td>0-0</td>
-                <td><span class="fake-streak">W0</span></td>
-                <td><span class="playoff-fake">--.-%</span></td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td><div class="team-placeholder"><span class="fake-logo"></span> [Team name]</div></td>
-                <td>00-00</td>
-                <td>0-0</td>
-                <td><span class="fake-streak">W0</span></td>
-                <td><span class="playoff-fake">--.-%</span></td>
-            </tr>
+            <!-- predictions.json -->
         </tbody>
     </table>
 
-    <div class="empty-notice">
-        ⚠️ This is a layout shell. <i>predictions.json</i> will populate real playoff percentages.<br>
-    </div>
-
-
     <div class="security-note">
-        Azure static blob · GitHub Actions CI/CD · no keys exposed · external predictions.json · GitHub secrets
+        Group Name: 4Sisters&NoWedding - CLDCOMP FINALS
     </div>
 </main>
 
