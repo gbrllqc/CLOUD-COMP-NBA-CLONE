@@ -242,29 +242,6 @@ body {
     display: inline-block;
 }
 
-.news-footer {
-    background: white;
-    border-radius: 18px;
-    padding: 20px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 6px solid #ffd700;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-    margin-top: 40px;
-}
-
-.news-headline {
-    font-weight: 700;
-    color: #1e1e1e;
-}
-
-.see-all-link {
-    color: #174c8f;
-    font-weight: 600;
-    text-decoration: none;
-}
-
 .security-note {
     margin-top: 15px;
     font-size: 12px;
