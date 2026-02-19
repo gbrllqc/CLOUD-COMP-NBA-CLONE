@@ -11,16 +11,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let allTeamsData = [];
     let filteredData = [];
 
+    // Show loading state
     if (tableBody) {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; padding: 40px;">
-                    <div class="loading-spinner">⏳ Loading playoff predictions...</div>
+                    <div class="loading-spinner">Loading playoff predictions...</div>
                 </td>
             </tr>
         `;
     }
 
+    // ALL NBA teams
     const eastTeams = [
         'Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets', 'Chicago Bulls',
         'Cleveland Cavaliers', 'Detroit Pistons', 'Indiana Pacers', 'Miami Heat', 'Milwaukee Bucks',
@@ -41,14 +43,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'West'; // Default to West if not found
     }
 
-    // Function to transform your JSON data
+    // Function for JSON data
     function transformData(rawData) {
         if (!rawData || !Array.isArray(rawData)) {
             console.error('Invalid data format:', rawData);
             return [];
         }
 
-        // Get most recent season for each team
+        console.log(`Transforming ${rawData.length} records...`);
+
         const teamMap = new Map();
         
         rawData.forEach(item => {
@@ -58,27 +61,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Transform each team's data
+        console.log(`Found ${teamMap.size} unique teams`);
+
+        
         const transformed = Array.from(teamMap.values()).map(item => {
-            const playoffPct = Math.round(item['1_predicted_proba'] * 100 * 10) / 10;
+            const playoffProb = item['1_predicted_proba'] !== undefined ? item['1_predicted_proba'] : 0;
+            const playoffPct = Math.round(playoffProb * 100 * 10) / 10;
             
             return {
-                teamName: item.Team_orig,
-                wins: item.Wins_orig,
-                losses: item.Losses_orig,
-                defRating: item['Defensive Rating_orig'],
-                threePct: item['Three Point %_orig'],
+                teamName: item.Team_orig || 'Unknown Team',
+                wins: item.Wins_orig || 0,
+                losses: item.Losses_orig || 0,
+                defRating: item['Defensive Rating_orig'] || 0,
+                threePct: item['Three Point %_orig'] || 0,
                 playoffPct: playoffPct,
                 conference: getConference(item.Team_orig)
             };
         });
 
-        // Sort by playoff percentage (highest first) and add rank
+        // Sort by playoff percentage
         transformed.sort((a, b) => b.playoffPct - a.playoffPct);
         transformed.forEach((team, index) => {
             team.rank = index + 1;
         });
 
+        console.log(`✅ Transformed ${transformed.length} teams for display`);
         return transformed;
     }
 
@@ -96,25 +103,36 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((team) => {
             const row = document.createElement('tr');
             
-            // Determine conference class for logo
-            const confClass = team.conference === 'East' ? 'east-team' : 'west-team';
+            // checks for all values
+            const rank = team.rank || 0;
+            const teamName = team.teamName || 'Unknown';
+            const wins = team.wins || 0;
+            const losses = team.losses || 0;
+            const defRating = team.defRating || 0;
+            const threePct = team.threePct || 0;
+            const playoffPct = team.playoffPct || 0;
+            const conference = team.conference || 'West';
+            
+            const confClass = conference === 'East' ? 'east-team' : 'west-team';
             
             row.innerHTML = `
-                <td>${team.rank}</td>
+                <td>${rank}</td>
                 <td>
                     <div class="team-placeholder">
                         <span class="logo ${confClass}"></span>
-                        ${team.teamName}
+                        ${teamName}
                     </div>
                 </td>
-                <td>${team.wins}-${team.losses}</td>
-                <td>${team.defRating.toFixed(1)}</td>
-                <td>${team.threePct.toFixed(1)}%</td>
-                <td class="playoff-pct">${team.playoffPct.toFixed(1)}%</td>
+                <td>${wins}-${losses}</td>
+                <td>${defRating.toFixed(1)}</td>
+                <td>${threePct.toFixed(1)}%</td>
+                <td class="playoff-pct">${playoffPct.toFixed(1)}%</td>
             `;
             
             tableBody.appendChild(row);
         });
+        
+        console.log(`Table populated with ${data.length} teams`);
     }
 
     // Filter functions
@@ -122,18 +140,21 @@ document.addEventListener('DOMContentLoaded', function() {
         filteredData = [...allTeamsData];
         populateTable(filteredData);
         updateActiveTab('all');
+        console.log(`Showing all ${filteredData.length} teams`);
     }
 
     function filterEast() {
         filteredData = allTeamsData.filter(team => team.conference === 'East');
         populateTable(filteredData);
         updateActiveTab('east');
+        console.log(`Showing ${filteredData.length} Eastern Conference teams`);
     }
 
     function filterWest() {
         filteredData = allTeamsData.filter(team => team.conference === 'West');
         populateTable(filteredData);
         updateActiveTab('west');
+        console.log(`Showing ${filteredData.length} Western Conference teams`);
     }
 
     function updateActiveTab(tab) {
@@ -143,30 +164,36 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tab === 'west') tabWest?.classList.add('active-conf');
     }
 
-    // Tab click handlers
-    tabAll?.addEventListener('click', filterAll);
-    tabEast?.addEventListener('click', filterEast);
-    tabWest?.addEventListener('click', filterWest);
 
-    // Fetch predictions.json
+    if (tabAll) tabAll.addEventListener('click', filterAll);
+    if (tabEast) tabEast.addEventListener('click', filterEast);
+    if (tabWest) tabWest.addEventListener('click', filterWest);
+
     fetch('predictions.json')
         .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
-            console.log('✅ Successfully loaded predictions.json');
+            console.log(`Loaded ${data.length} total records`);
+            
+            
             allTeamsData = transformData(data);
+            
+            
             filterAll();
         })
         .catch(error => {
-            console.error('❌ Error loading predictions.json:', error);
+            console.error('Error loading predictions.json:', error);
             if (tableBody) {
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 40px;">
                             <div style="color: #a1282a;">
-                                ⚠️ Error loading predictions.json<br>
+                                Error loading predictions.json<br>
+                                <small style="color: #666;">${error.message}</small><br>
                                 <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 15px; background: #174c8f; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry</button>
                             </div>
                         </td>
