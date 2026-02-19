@@ -1,0 +1,27 @@
+name: Deploy to Azure Blob Storage
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CONNECTION_STRING }}
+
+      - name: Deploy to $web container
+        run: |
+          az storage blob upload-batch \
+            --account-name nbaplayoffpredictor \
+            --destination \$web \
+            --source . \
+            --overwrite \
+            --connection-string ${{ secrets.AZURE_CONNECTION_STRING }}
