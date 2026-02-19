@@ -1,4 +1,5 @@
-
+// app.js - Fetches predictions.json and populates the table
+// Shows ALL seasons from your JSON (2018-19 to 2025-26)
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('NBA Oracle initializing...');
@@ -12,17 +13,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let allTeamsData = [];
     let filteredData = [];
 
-
+    // Show loading state
     if (tableBody) {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; padding: 40px;">
-                    <div class="loading-spinner">Loading playoff predictions...</div>
+                    <div class="loading-spinner">⏳ Loading playoff predictions...</div>
                 </td>
             </tr>
         `;
     }
 
+    // Complete list of ALL NBA teams by conference
     const eastTeams = [
         'Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets', 'Chicago Bulls',
         'Cleveland Cavaliers', 'Detroit Pistons', 'Indiana Pacers', 'Miami Heat', 'Milwaukee Bucks',
@@ -36,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'San Antonio Spurs', 'Utah Jazz'
     ];
 
-    // determine conference
+    // Function to determine conference
     function getConference(teamName) {
         if (!teamName) return 'West';
         if (eastTeams.includes(teamName)) return 'East';
@@ -44,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'West';
     }
 
-    // convert value to number
+    // convert " " value to number
     function safeNumber(value, defaultValue = 0) {
         if (value === undefined || value === null || value === '') {
             return defaultValue;
@@ -52,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const num = Number(value);
         return isNaN(num) ? defaultValue : num;
     }
+
 
     function transformData(rawData) {
         if (!rawData || !Array.isArray(rawData)) {
@@ -61,11 +64,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log(`Transforming ${rawData.length} records from all seasons...`);
 
+        
         const transformed = rawData.map(item => {
             const teamName = item.Team_orig;
-            if (!teamName) return null; // Skip if no team name
+            if (!teamName) return null; 
             
-            // get playoff probability
+            // playoff probability
             const playoffProb = item['1_predicted_proba'];
             let playoffPct = 0;
             
@@ -73,11 +77,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 playoffPct = Math.round(playoffProb * 100 * 10) / 10;
             }
             
-            // get empty strings
+            // get numeric values (handling empty strings)
             const wins = safeNumber(item.Wins_orig);
             const losses = safeNumber(item.Losses_orig);
             
-            
+           
             const defRating = safeNumber(item.Defensive_Rating_orig);
             const threePct = safeNumber(item.Three_Point_Percentage_orig);
             
@@ -90,11 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 threePct: threePct,
                 playoffPct: playoffPct,
                 conference: getConference(teamName),
+                
                 madePlayoffs: item.MadePlayoffs_orig
             };
-        }).filter(item => item !== null); 
+        }).filter(item => item !== null);
 
-        // Sort by season 
+
         const seasonOrder = {
             '2025-26': 1,
             '2024-25': 2,
@@ -107,14 +112,26 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         transformed.sort((a, b) => {
-            // First sort by season (newest first)
+            // sort by season 
             const seasonA = seasonOrder[a.season] || 99;
             const seasonB = seasonOrder[b.season] || 99;
             if (seasonA !== seasonB) {
                 return seasonA - seasonB;
             }
-            // Then by playoff percentage within same season
+
             return b.playoffPct - a.playoffPct;
+        });
+
+        let currentSeason = '';
+        let seasonRank = 1;
+        
+        transformed.forEach((team, index) => {
+            if (team.season !== currentSeason) {
+                currentSeason = team.season;
+                seasonRank = 1;
+            }
+            team.rank = seasonRank;
+            seasonRank++;
         });
 
         console.log(`Transformed ${transformed.length} records from all seasons`);
@@ -129,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return transformed;
     }
 
-    // Function to populate table 
     function populateTable(data) {
         if (!tableBody) return;
         
@@ -143,17 +159,20 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentSeason = '';
         
         data.forEach((team) => {
-            const row = document.createElement('tr');
-            
             if (team.season !== currentSeason) {
                 currentSeason = team.season;
+                const seasonRow = document.createElement('tr');
+                seasonRow.innerHTML = `<td colspan="6" style="background: #eef2f7; text-align: center; padding: 10px; font-weight: bold; color: #174c8f;">${currentSeason} SEASON</td>`;
+                tableBody.appendChild(seasonRow);
             }
+            
+            const row = document.createElement('tr');
             
             
             const rank = team.rank || '-';
             const teamName = team.teamName || 'Unknown';
             
-            // Convert " " to numbers
+            // Convert to numbers
             const wins = typeof team.wins === 'number' ? team.wins : 0;
             const losses = typeof team.losses === 'number' ? team.losses : 0;
             const defRating = typeof team.defRating === 'number' ? team.defRating : 0;
@@ -174,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>
                     <div class="team-placeholder">
                         <span class="logo ${confClass}"></span>
-                        ${teamName} ${seasonDisplay}
+                        ${teamName}
                     </div>
                 </td>
                 <td>${wins}-${losses}</td>
@@ -220,12 +239,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tab === 'west' && tabWest) tabWest.classList.add('active-conf');
     }
 
-  
+
     if (tabAll) tabAll.addEventListener('click', filterAll);
     if (tabEast) tabEast.addEventListener('click', filterEast);
     if (tabWest) tabWest.addEventListener('click', filterWest);
 
-    
+   
     fetch('predictions.json')
         .then(response => {
             if (!response.ok) {
@@ -238,6 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             
             allTeamsData = transformData(data);
+            
             
             filterAll();
         })
