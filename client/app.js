@@ -1,5 +1,5 @@
-// app.js - Fetches predictions.json and populates the table
-// Shows ALL seasons from your JSON (2018-19 to 2025-26)
+// app.js - Fetches predictions.json and shows ONLY 2026 forecast
+// Your HTML and CSS remain UNCHANGED
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('NBA Oracle initializing...');
@@ -18,13 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; padding: 40px;">
-                    <div class="loading-spinner">⏳ Loading playoff predictions...</div>
+                    <div class="loading-spinner">⏳ Loading 2026 playoff predictions...</div>
                 </td>
             </tr>
         `;
     }
 
-    // Complete list of ALL NBA teams by conference
     const eastTeams = [
         'Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets', 'Chicago Bulls',
         'Cleveland Cavaliers', 'Detroit Pistons', 'Indiana Pacers', 'Miami Heat', 'Milwaukee Bucks',
@@ -55,19 +54,24 @@ document.addEventListener('DOMContentLoaded', function() {
         return isNaN(num) ? defaultValue : num;
     }
 
-
     function transformData(rawData) {
         if (!rawData || !Array.isArray(rawData)) {
             console.error('Invalid data format:', rawData);
             return [];
         }
 
-        console.log(`Transforming ${rawData.length} records from all seasons...`);
+        console.log(`Filtering ${rawData.length} records for 2025-26 season...`);
 
+
+        const currentSeason = '2025-26';
+        const seasonData = rawData.filter(item => item.Season_orig === currentSeason);
         
-        const transformed = rawData.map(item => {
+        console.log(`Found ${seasonData.length} records for ${currentSeason}`);
+
+        // Transform the data
+        const transformed = seasonData.map(item => {
             const teamName = item.Team_orig;
-            if (!teamName) return null; 
+            if (!teamName) return null;
             
             // playoff probability
             const playoffProb = item['1_predicted_proba'];
@@ -77,102 +81,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 playoffPct = Math.round(playoffProb * 100 * 10) / 10;
             }
             
-            // get numeric values (handling empty strings)
+            
             const wins = safeNumber(item.Wins_orig);
             const losses = safeNumber(item.Losses_orig);
-            
-           
             const defRating = safeNumber(item.Defensive_Rating_orig);
             const threePct = safeNumber(item.Three_Point_Percentage_orig);
             
             return {
                 teamName: teamName,
-                season: item.Season_orig || 'Unknown',
                 wins: wins,
                 losses: losses,
                 defRating: defRating,
                 threePct: threePct,
                 playoffPct: playoffPct,
-                conference: getConference(teamName),
-                
-                madePlayoffs: item.MadePlayoffs_orig
+                conference: getConference(teamName)
             };
         }).filter(item => item !== null);
 
-
-        const seasonOrder = {
-            '2025-26': 1,
-            '2024-25': 2,
-            '2023-24': 3,
-            '2022-23': 4,
-            '2021-22': 5,
-            '2020-21': 6,
-            '2019-20': 7,
-            '2018-19': 8
-        };
-
-        transformed.sort((a, b) => {
-            // sort by season 
-            const seasonA = seasonOrder[a.season] || 99;
-            const seasonB = seasonOrder[b.season] || 99;
-            if (seasonA !== seasonB) {
-                return seasonA - seasonB;
-            }
-
-            return b.playoffPct - a.playoffPct;
-        });
-
-        let currentSeason = '';
-        let seasonRank = 1;
-        
+        // Sort by playoff percentage
+        transformed.sort((a, b) => b.playoffPct - a.playoffPct);
         transformed.forEach((team, index) => {
-            if (team.season !== currentSeason) {
-                currentSeason = team.season;
-                seasonRank = 1;
-            }
-            team.rank = seasonRank;
-            seasonRank++;
+            team.rank = index + 1;
         });
 
-        console.log(`Transformed ${transformed.length} records from all seasons`);
-        
-        // Count by season for verification
-        const seasonCount = {};
-        transformed.forEach(item => {
-            seasonCount[item.season] = (seasonCount[item.season] || 0) + 1;
-        });
-        console.log('Records by season:', seasonCount);
+        console.log('Top 5 teams:', transformed.slice(0, 5));
         
         return transformed;
     }
 
+    // Function to populate table
     function populateTable(data) {
         if (!tableBody) return;
         
         if (!data || data.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">No teams found</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">No 2026 prediction data found</td></tr>`;
             return;
         }
         
         tableBody.innerHTML = '';
         
-        let currentSeason = '';
-        
         data.forEach((team) => {
-            if (team.season !== currentSeason) {
-                currentSeason = team.season;
-                const seasonRow = document.createElement('tr');
-                seasonRow.innerHTML = `<td colspan="6" style="background: #eef2f7; text-align: center; padding: 10px; font-weight: bold; color: #174c8f;">${currentSeason} SEASON</td>`;
-                tableBody.appendChild(seasonRow);
-            }
-            
             const row = document.createElement('tr');
             
-            
+            // Extract values with defaults
             const rank = team.rank || '-';
             const teamName = team.teamName || 'Unknown';
-            
-            // Convert to numbers
             const wins = typeof team.wins === 'number' ? team.wins : 0;
             const losses = typeof team.losses === 'number' ? team.losses : 0;
             const defRating = typeof team.defRating === 'number' ? team.defRating : 0;
@@ -180,13 +133,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const playoffPct = typeof team.playoffPct === 'number' ? team.playoffPct : 0;
             const conference = team.conference || 'West';
             
-            
+            // Format numbers
             const defRatingFormatted = defRating.toFixed(1);
             const threePctFormatted = threePct.toFixed(1);
             const playoffPctFormatted = playoffPct.toFixed(1);
             
-            
+            // Determine conference class for logo
             const confClass = conference === 'East' ? 'east-team' : 'west-team';
+            
+            // Add color coding based on playoff probability
+            let pctColor = '';
+            if (playoffPct >= 90) pctColor = 'style="color: #0e6b0e; font-weight: 800;"';
+            else if (playoffPct >= 50) pctColor = 'style="color: #b97c0d; font-weight: 800;"';
+            else pctColor = 'style="color: #a1282a; font-weight: 800;"';
             
             row.innerHTML = `
                 <td>${rank}</td>
@@ -199,13 +158,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${wins}-${losses}</td>
                 <td>${defRatingFormatted}</td>
                 <td>${threePctFormatted}%</td>
-                <td class="playoff-pct">${playoffPctFormatted}%</td>
+                <td ${pctColor}>${playoffPctFormatted}%</td>
             `;
             
             tableBody.appendChild(row);
         });
         
-        console.log(`Table populated with ${data.length} records from all seasons`);
+        console.log(`Table showing ${data.length} teams for 2026 playoff forecast`);
     }
 
     // Filter functions
@@ -213,21 +172,18 @@ document.addEventListener('DOMContentLoaded', function() {
         filteredData = [...allTeamsData];
         populateTable(filteredData);
         updateActiveTab('all');
-        console.log(`Showing all ${filteredData.length} records`);
     }
 
     function filterEast() {
         filteredData = allTeamsData.filter(team => team.conference === 'East');
         populateTable(filteredData);
         updateActiveTab('east');
-        console.log(`Showing ${filteredData.length} Eastern Conference records`);
     }
 
     function filterWest() {
         filteredData = allTeamsData.filter(team => team.conference === 'West');
         populateTable(filteredData);
         updateActiveTab('west');
-        console.log(`Showing ${filteredData.length} Western Conference records`);
     }
 
     function updateActiveTab(tab) {
@@ -239,12 +195,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tab === 'west' && tabWest) tabWest.classList.add('active-conf');
     }
 
-
+    // Tab click handlers
     if (tabAll) tabAll.addEventListener('click', filterAll);
     if (tabEast) tabEast.addEventListener('click', filterEast);
     if (tabWest) tabWest.addEventListener('click', filterWest);
 
-   
+    // Fetch predictions.json
     fetch('predictions.json')
         .then(response => {
             if (!response.ok) {
@@ -253,12 +209,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            console.log(`Loaded ${data.length} total records`);
+            console.log('✅ Successfully loaded predictions.json');
             
-            
+            // Transform the data - ONLY 2025-26 season
             allTeamsData = transformData(data);
             
-            
+            // Show all teams by default
             filterAll();
         })
         .catch(error => {
@@ -268,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 40px;">
                             <div style="color: #a1282a;">
-                                Error loading predictions.json<br>
+                                Error loading 2026 predictions<br>
                                 <small style="color: #666;">${error.message}</small><br>
                                 <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 15px; background: #174c8f; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry</button>
                             </div>
