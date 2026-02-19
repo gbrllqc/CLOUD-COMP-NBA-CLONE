@@ -1,6 +1,3 @@
-// app.js - Fetches predictions.json and shows ONLY 2026 forecast
-// Your HTML and CSS remain UNCHANGED
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log('NBA Oracle initializing...');
     
@@ -13,17 +10,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let allTeamsData = [];
     let filteredData = [];
 
-    // Show loading state
     if (tableBody) {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; padding: 40px;">
-                    <div class="loading-spinner">⏳ Loading 2026 playoff predictions...</div>
+                    <div class="loading-spinner">Loading 2026 playoff predictions...</div>
                 </td>
             </tr>
         `;
     }
 
+    // ALL 30 NBA teams
     const eastTeams = [
         'Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets', 'Chicago Bulls',
         'Cleveland Cavaliers', 'Detroit Pistons', 'Indiana Pacers', 'Miami Heat', 'Milwaukee Bucks',
@@ -37,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'San Antonio Spurs', 'Utah Jazz'
     ];
 
-    // Function to determine conference
+    // determine conference
     function getConference(teamName) {
         if (!teamName) return 'West';
         if (eastTeams.includes(teamName)) return 'East';
@@ -45,15 +42,22 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'West';
     }
 
-    // convert " " value to number
-    function safeNumber(value, defaultValue = 0) {
+    function safeDisplay(value, defaultValue = '--', isPercentage = false) {
         if (value === undefined || value === null || value === '') {
             return defaultValue;
         }
+        if (typeof value === 'number') {
+            return isPercentage ? value.toFixed(1) + '%' : value.toFixed(1);
+        }
+        // convert to number if it's a string number
         const num = Number(value);
-        return isNaN(num) ? defaultValue : num;
+        if (!isNaN(num)) {
+            return isPercentage ? num.toFixed(1) + '%' : num.toFixed(1);
+        }
+        return defaultValue;
     }
 
+    // transform JSON data 
     function transformData(rawData) {
         if (!rawData || !Array.isArray(rawData)) {
             console.error('Invalid data format:', rawData);
@@ -62,54 +66,77 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log(`Filtering ${rawData.length} records for 2025-26 season...`);
 
-
+        // current year predictions
         const currentSeason = '2025-26';
         const seasonData = rawData.filter(item => item.Season_orig === currentSeason);
         
         console.log(`Found ${seasonData.length} records for ${currentSeason}`);
 
-        // Transform the data
-        const transformed = seasonData.map(item => {
-            const teamName = item.Team_orig;
-            if (!teamName) return null;
-            
-            // playoff probability
-            const playoffProb = item['1_predicted_proba'];
-            let playoffPct = 0;
-            
-            if (playoffProb !== undefined && playoffProb !== null && !isNaN(playoffProb)) {
-                playoffPct = Math.round(playoffProb * 100 * 10) / 10;
-            }
-            
-            
-            const wins = safeNumber(item.Wins_orig);
-            const losses = safeNumber(item.Losses_orig);
-            const defRating = safeNumber(item.Defensive_Rating_orig);
-            const threePct = safeNumber(item.Three_Point_Percentage_orig);
-            
-            return {
-                teamName: teamName,
-                wins: wins,
-                losses: losses,
-                defRating: defRating,
-                threePct: threePct,
-                playoffPct: playoffPct,
-                conference: getConference(teamName)
-            };
-        }).filter(item => item !== null);
+        
+        const teamDataMap = new Map();
+        seasonData.forEach(item => {
+            teamDataMap.set(item.Team_orig, item);
+        });
 
-        // Sort by playoff percentage
-        transformed.sort((a, b) => b.playoffPct - a.playoffPct);
+        
+        const allTeams = [...eastTeams, ...westTeams];
+        const transformed = [];
+
+        allTeams.forEach(teamName => {
+            const existingData = teamDataMap.get(teamName);
+            
+            if (existingData) {
+                const playoffProb = existingData['1_predicted_proba'];
+                let playoffPct = 0;
+                
+                if (playoffProb !== undefined && playoffProb !== null && !isNaN(playoffProb)) {
+                    playoffPct = Math.round(playoffProb * 100 * 10) / 10;
+                }
+                
+                transformed.push({
+                    teamName: teamName,
+                    wins: existingData.Wins_orig,
+                    losses: existingData.Losses_orig,
+                    defRating: existingData.Defensive_Rating_orig,
+                    threePct: existingData.Three_Point_Percentage_orig,
+                    playoffPct: playoffPct,
+                    conference: getConference(teamName),
+                    hasData: true
+                });
+            } else {
+                transformed.push({
+                    teamName: teamName,
+                    wins: '',
+                    losses: '',
+                    defRating: '',
+                    threePct: '',
+                    playoffPct: 0,
+                    conference: getConference(teamName),
+                    hasData: false
+                });
+            }
+        });
+
+        // Sort by playoff percentage 
+        transformed.sort((a, b) => {
+            
+            if (a.hasData && !b.hasData) return -1;
+            if (!a.hasData && b.hasData) return 1;
+            return b.playoffPct - a.playoffPct;
+        });
+
         transformed.forEach((team, index) => {
             team.rank = index + 1;
         });
 
-        console.log('Top 5 teams:', transformed.slice(0, 5));
+        const dataCount = transformed.filter(t => t.hasData).length;
+        const blankCount = transformed.filter(t => !t.hasData).length;
+        console.log(`Loaded ${dataCount} teams with data, ${blankCount} teams with blank stats`);
         
         return transformed;
     }
 
-    // Function to populate table
+    // populate table
     function populateTable(data) {
         if (!tableBody) return;
         
@@ -123,48 +150,57 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((team) => {
             const row = document.createElement('tr');
             
-            // Extract values with defaults
+            
             const rank = team.rank || '-';
             const teamName = team.teamName || 'Unknown';
-            const wins = typeof team.wins === 'number' ? team.wins : 0;
-            const losses = typeof team.losses === 'number' ? team.losses : 0;
-            const defRating = typeof team.defRating === 'number' ? team.defRating : 0;
-            const threePct = typeof team.threePct === 'number' ? team.threePct : 0;
-            const playoffPct = typeof team.playoffPct === 'number' ? team.playoffPct : 0;
-            const conference = team.conference || 'West';
             
-            // Format numbers
-            const defRatingFormatted = defRating.toFixed(1);
-            const threePctFormatted = threePct.toFixed(1);
-            const playoffPctFormatted = playoffPct.toFixed(1);
+            // wins-losses
+            const record = (team.wins !== '' && team.losses !== '') 
+                ? `${team.wins}-${team.losses}` 
+                : '--';
             
-            // Determine conference class for logo
-            const confClass = conference === 'East' ? 'east-team' : 'west-team';
+            // def rating and 3P%
+            const defRatingDisplay = safeDisplay(team.defRating, '--');
+            const threePctDisplay = team.threePct !== '' && team.threePct !== undefined 
+                ? (typeof team.threePct === 'number' ? team.threePct.toFixed(1) + '%' : team.threePct + '%')
+                : '--%';
             
-            // Add color coding based on playoff probability
-            let pctColor = '';
-            if (playoffPct >= 90) pctColor = 'style="color: #0e6b0e; font-weight: 800;"';
-            else if (playoffPct >= 50) pctColor = 'style="color: #b97c0d; font-weight: 800;"';
-            else pctColor = 'style="color: #a1282a; font-weight: 800;"';
+            // playoff percentage
+            let playoffPctDisplay = '--%';
+            let pctClass = 'playoff-pct';
+            
+            if (team.hasData && team.playoffPct > 0) {
+                playoffPctDisplay = team.playoffPct.toFixed(1) + '%';
+                if (team.playoffPct >= 90) pctClass += ' high';
+                else if (team.playoffPct >= 50) pctClass += ' medium';
+                else pctClass += ' low';
+            }
+            
+            
+            const confClass = team.conference === 'East' ? 'east-team' : 'west-team';
+            
+            
+            const rowClass = !team.hasData ? 'style="opacity: 0.7;"' : '';
             
             row.innerHTML = `
-                <td>${rank}</td>
-                <td>
+                <td ${rowClass}>${rank}</td>
+                <td ${rowClass}>
                     <div class="team-placeholder">
                         <span class="logo ${confClass}"></span>
                         ${teamName}
                     </div>
                 </td>
-                <td>${wins}-${losses}</td>
-                <td>${defRatingFormatted}</td>
-                <td>${threePctFormatted}%</td>
-                <td ${pctColor}>${playoffPctFormatted}%</td>
+                <td ${rowClass}>${record}</td>
+                <td ${rowClass}>${defRatingDisplay}</td>
+                <td ${rowClass}>${threePctDisplay}</td>
+                <td ${rowClass} class="${pctClass}">${playoffPctDisplay}</td>
             `;
             
             tableBody.appendChild(row);
         });
         
-        console.log(`Table showing ${data.length} teams for 2026 playoff forecast`);
+        const dataCount = data.filter(t => t.hasData).length;
+        console.log(`Table showing ${data.length} teams (${dataCount} with data, ${data.length - dataCount} with blank stats)`);
     }
 
     // Filter functions
@@ -195,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tab === 'west' && tabWest) tabWest.classList.add('active-conf');
     }
 
-    // Tab click handlers
+
     if (tabAll) tabAll.addEventListener('click', filterAll);
     if (tabEast) tabEast.addEventListener('click', filterEast);
     if (tabWest) tabWest.addEventListener('click', filterWest);
@@ -211,10 +247,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('✅ Successfully loaded predictions.json');
             
-            // Transform the data - ONLY 2025-26 season
+            
             allTeamsData = transformData(data);
             
-            // Show all teams by default
+            
             filterAll();
         })
         .catch(error => {
