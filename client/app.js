@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; padding: 40px;">
-                    <div class="loading-spinner">⏳ Loading 2026 playoff predictions...</div>
+                    <div class="loading-spinner">Loading 2026 playoff predictions...</div>
                 </td>
             </tr>
         `;
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentCount = transformed.filter(t => t.source === 'current').length;
         const historicalCount = transformed.filter(t => t.source === 'historical').length;
         
-        console.log(`✅ Loaded ${transformed.length} total teams for 2025-26`);
+        console.log(`Loaded ${transformed.length} total teams for 2025-26`);
         console.log(`   - ${currentCount} teams with current 2025-26 data`);
         console.log(`   - ${historicalCount} teams with historical data (most recent season)`);
         
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            console.log('✅ Successfully loaded predictions.json');
+            console.log('Successfully loaded predictions.json');
             
             // Transform the data - builds complete 30-team dataset
             allTeamsData = transformData(data);
@@ -273,13 +273,13 @@ document.addEventListener('DOMContentLoaded', function() {
             filterAll();
         })
         .catch(error => {
-            console.error('❌ Error loading predictions.json:', error);
+            console.error('Error loading predictions.json:', error);
             if (tableBody) {
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 40px;">
                             <div style="color: #a1282a;">
-                                ⚠️ Error loading 2026 predictions<br>
+                                Error loading 2026 predictions<br>
                                 <small style="color: #666;">${error.message}</small><br>
                                 <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 15px; background: #174c8f; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry</button>
                             </div>
