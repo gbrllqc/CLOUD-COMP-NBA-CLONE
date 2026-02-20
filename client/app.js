@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            console.log('✅ Successfully loaded predictions.json');
+            console.log('Successfully loaded predictions.json');
             
             
             allTeamsData = transformData(data);
